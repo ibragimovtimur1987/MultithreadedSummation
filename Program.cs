@@ -1,10 +1,16 @@
 ﻿using System.Diagnostics;
-int[] sizeArray = [100000, 1000000, 1000000];
+long[] sizeArray = [100000, 1000000, 1000000];
 
-foreach (int size in sizeArray)
+foreach (long size in sizeArray)
 {
     Console.WriteLine($"size = {size}");
-    var array = Enumerable.Range(0, size).ToArray();
+    Random rand = new Random();
+    long[] array = new long[size];
+
+    for (int i = 0; i < size; i++)
+    {
+        array[i] = (long)rand.Next(1, Int32.MaxValue); // Большие значения
+    }
     
     SumArray(array, SequentiallySum, "SequentiallySum");
     SumArray(array, ParallelSum, "ParallelSum");
@@ -12,7 +18,7 @@ foreach (int size in sizeArray)
  
 }
 
-void SumArray(int[] array, Func<int[], long> func, string nameSum)
+void SumArray(long[] array, Func<long[], long> func, string nameSum)
 {
     var stw = Stopwatch.StartNew();
     var sum = func(array);
@@ -20,9 +26,9 @@ void SumArray(int[] array, Func<int[], long> func, string nameSum)
     Console.WriteLine($"{nameSum} sum = {sum} time = {stw.ElapsedMilliseconds}");
 }
 
-long SequentiallySum(int[] array)
+long SequentiallySum(long[] array)
 {
-    int sum = 0;
+    long sum = 0;
     foreach (var i in array)
     {
         sum += i;
@@ -30,12 +36,12 @@ long SequentiallySum(int[] array)
     return sum;
 }
 
-long ParallelSum(int[] array)
+long ParallelSum(long[] array)
 {
     return array.AsParallel().Sum();
 }
 
-long ThreadedSum(int[] array)
+long ThreadedSum(long[] array)
 {
     int numberOfThreads = 10; 
     SumCalculator calculator = new SumCalculator();
@@ -60,11 +66,11 @@ long ThreadedSum(int[] array)
 
 class SumCalculator
 {
-    public int Sum; 
+    public long Sum; 
 
-    public void SumArraySegment(int[] array, int start, int end)
+    public void SumArraySegment(long[] array, int start, int end)
     {
-        int localSum = 0;
+        long localSum = 0;
         for (int i = start; i < end; i++)
         {
             localSum += array[i];
