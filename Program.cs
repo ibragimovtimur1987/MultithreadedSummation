@@ -1,5 +1,28 @@
 ﻿using System.Diagnostics;
-long[] sizeArray = [100000, 1000000, 1000000];
+using System.Management;
+
+long[] sizeArray = [100000, 1000000, 10000000];
+
+
+Console.WriteLine("Версия ОС: " + Environment.OSVersion);
+Console.WriteLine("Количество процессоров: " + Environment.ProcessorCount);
+
+// Получение информации о процессоре
+var searcherCpu = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+foreach (ManagementObject obj in searcherCpu.Get())
+{
+    Console.WriteLine("Процессор: " + obj["Name"]);
+}
+
+// Получение информации о оперативной памяти
+var searcherMemory = new ManagementObjectSearcher("SELECT * FROM Win32_PhysicalMemory");
+ulong totalMemory = 0;
+foreach (ManagementObject obj in searcherMemory.Get())
+{
+    totalMemory += (ulong)obj["Capacity"];
+}
+
+Console.WriteLine("Объем оперативной памяти: " + totalMemory / (1024 * 1024) + " МБ");
 
 foreach (long size in sizeArray)
 {
@@ -13,9 +36,8 @@ foreach (long size in sizeArray)
     }
     
     SumArray(array, SequentiallySum, "SequentiallySum");
-    SumArray(array, ParallelSum, "ParallelSum");
     SumArray(array, ThreadedSum, "ThreadedSum");
- 
+    SumArray(array, ParallelSum, "ParallelSum");
 }
 
 void SumArray(long[] array, Func<long[], long> func, string nameSum)
